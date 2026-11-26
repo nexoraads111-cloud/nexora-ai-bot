@@ -47,7 +47,11 @@ def webhook():
     if time.monotonic() - stamp >= TTL:
         previous = []
     current = {"role":"user","content":m["text"][:4000]}
-    r = requests.post(os.environ["AI_API_URL"], headers={"Authorization":"Bearer "+os.environ["AI_API_KEY"]}, json={"model":os.environ["AI_MODEL"],"messages":[{"role":"system","content":prompt}] + previous + [current]}, timeout=20)
+    try:
+        r = requests.post(os.environ["AI_API_URL"], headers={"Authorization":"Bearer "+os.environ["AI_API_KEY"]}, json={"model":os.environ["AI_MODEL"],"messages":[{"role":"system","content":prompt}] + previous + [current]}, timeout=(5, 45))
+    except requests.exceptions.RequestException as exc:
+        app.logger.warning('AI API request failed: %s', type(exc).__name__)
+        return '', 503
     if not r.ok:
         app.logger.warning("AI API HTTP status %s", r.status_code)
         return "", 503
