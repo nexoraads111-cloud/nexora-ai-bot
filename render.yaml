@@ -1,0 +1,21 @@
+services:
+  - type: web
+    name: nexora-ai-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn --timeout 60 main:app
+    healthCheckPath: /
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: AI_API_URL
+        sync: false
+      - key: AI_API_KEY
+        sync: false
+      - key: AI_MODEL
+        sync: false
+      - key: ALLOWED_CHAT_IDS
+        sync: false
